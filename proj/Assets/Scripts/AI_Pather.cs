@@ -11,13 +11,13 @@ public class AI_Pather : MonoBehaviour {
 	CharacterController charController;
 	int currentWaypoint;
 	
-	float speed = 20.0f;
+	float speed = 10.0f;
 	float maxWaypointDistance = 2.0f;
 	
 	void Start () {
 	seeker = GetComponent<Seeker>();
 	seeker.StartPath(transform.position, target.position, OnPathCompleted);
-		charController = GetComponent<CharacterController>();
+	charController = GetComponent<CharacterController>();
 	}
 	
 	public void OnPathCompleted(Path p)
@@ -39,14 +39,17 @@ public class AI_Pather : MonoBehaviour {
 	
 		
 		if (currentWaypoint >= path.vectorPath.Count)
+		{
+			//gameObject.animation.Play(["idle"]
 			return;
+		}
 		
 		
 		Vector3 direction = (path.vectorPath[currentWaypoint] - transform.position).normalized * speed;
 		charController.SimpleMove(direction);
-		
+		gameObject.transform.forward = direction.normalized;
 		if (Vector3.Distance(transform.position, path.vectorPath[currentWaypoint]) < maxWaypointDistance){ 
-		currentWaypoint++;
+			currentWaypoint++;
 		}
 	}
 	

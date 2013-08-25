@@ -48,7 +48,8 @@ public class AI_Pather : MonoBehaviour {
 		Vector3 direction = (path.vectorPath[currentWaypoint] - transform.position).normalized * speed;
 		charController.SimpleMove(direction);
 		gameObject.transform.forward = direction.normalized;
-		if (Vector3.Distance(transform.position, path.vectorPath[currentWaypoint]) < maxWaypointDistance){ 
+		float distance = Vector3.Distance(transform.position, path.vectorPath[currentWaypoint]);
+		if (distance < maxWaypointDistance){ 
 			currentWaypoint++;
 		}
 	}

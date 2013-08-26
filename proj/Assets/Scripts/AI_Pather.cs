@@ -17,6 +17,7 @@ public class AI_Pather : MonoBehaviour {
 	void Start () {
 	seeker = GetComponent<Seeker>();
 	seeker.StartPath(transform.position, target.position, OnPathCompleted);
+
 	charController = GetComponent<CharacterController>();
 	}
 	
@@ -24,11 +25,11 @@ public class AI_Pather : MonoBehaviour {
 	{
 		if (!p.error)
 		{
-		path = p ;
-		currentWaypoint = 0 ;
+			path = p ;
+			currentWaypoint = 0 ;
 		}
 		else{
-			Debug.Log(p.error);
+			UnityEngine.Debug.Log(p.error);
 		}
 	}
 	

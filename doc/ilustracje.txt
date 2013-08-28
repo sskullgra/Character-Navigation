@@ -1,0 +1,17 @@
+Ilustracja 1 Stra¿ zamku w grze Thief
+Ilustracja 2 Przyk³ad dzia³ania zmys³ów w grze Thief
+Ilustracja 3 Zrzut ekranu z gry The Sims
+Ilustracja 4 Funkcje wag potrzeb agenta
+Ilustracja 5 Przyk³ad skierowanego grafu acyklicznego zachowañ
+Ilustracja 6 Osada wraz z trenowanym stworzeniem w grze Black & White
+Ilustracja 7 Model sztucznej inteligencji
+Ilustracja 8 Graf
+Ilustracja 9 Graf posiadaj¹cy koszty
+Ilustracja 10 Graf z rozwa¿an¹ drog¹ A-B-C
+Ilustracja 11 Wêz³y grafu okreœlaj¹ce regiony
+Ilustracja 12 Graf skierowany wa¿ony
+Ilustracja 13 Przyk³ad grafu, gdzie ka¿da œcie¿ka jest optymalna
+Ilustracja 14 Dijkastra - pierwsza iteracja
+Ilustracja 15 Dijkstra - kolejna iteracja
+Ilustracja 16 Aktualizacja otwartego wêz³a
+Ilustracja 17 Graf po zakoñczeniu obliczeñ

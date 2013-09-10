@@ -6,6 +6,12 @@ namespace JumpPointSearach
 {
 	public class Node
 	{
+		#region Consts
+		
+		private const float SQRT_2 = 1.414213562373095f;
+		
+		#endregion
+		
 		#region Fields
 		private float mCostFunction;
 		private readonly float mHeuristicEstimateCost = 0;
@@ -114,7 +120,7 @@ namespace JumpPointSearach
 		public static float estimate (Vector3 cur, Vector3 goal)
 		{
 			float diagonal = Mathf.Min (Mathf.Abs (cur.x - goal.x), Mathf.Abs (cur.z - goal.z));
-			return 1.414213562373095f * diagonal + ((Mathf.Abs (cur.x - goal.x) + Mathf.Abs (cur.z - goal.z)) - 2 * diagonal);
+			return SQRT_2 * diagonal + ((Mathf.Abs (cur.x - goal.x) + Mathf.Abs (cur.z - goal.z)) - 2 * diagonal);
 		}
 		
 		public bool Equals (Node item)

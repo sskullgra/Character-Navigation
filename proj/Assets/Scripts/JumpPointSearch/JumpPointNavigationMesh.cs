@@ -34,7 +34,7 @@ public class JumpPointNavigationMesh : MonoBehaviour
 	private int mTerrainResolution = 4;
 
 	private List<Object> mPaths = new List<Object> ();
-	List<Node> mNeighbors = null;
+	private List<Node> mNeighbors = null;
 	
 	#endregion
 	
@@ -75,9 +75,6 @@ public class JumpPointNavigationMesh : MonoBehaviour
 			
 			Point endCor = GetGridPosition(DestinationTransform.position);
 			Vector3 endVec = GetWorldPosition(endCor.X, endCor.Y);
-
-			
-			//StartCoroutine (findPath (StartTransform.position, DestinationTransform.position));
 			
 			StartCoroutine(FindPath(startVec, endVec));
 		}
@@ -89,7 +86,7 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		TerrainData terrainData = terrainCollider.terrainData;
 		
 		mWidth = terrainData.heightmapWidth;
-		mHeight = terrainData.heightmapWidth;
+		mHeight = terrainData.heightmapHeight;
 		
 		mTerrainScale = terrainData.size;
 		
@@ -218,7 +215,9 @@ public class JumpPointNavigationMesh : MonoBehaviour
 	}
 	
 	private bool isReachable(int px, int py, int x, int y){
-       if(x > -1 && y > -1 && x < mWidth && y < mHeight) return (Mathf.Abs(mHeightMap[px,py] - mHeightMap[x,y]) < MaxHeightDelta);
+       if(x > -1 && y > -1 && x < mWidth && y < mHeight) { 
+			return (Mathf.Abs(mHeightMap[px,py] - mHeightMap[x,y]) < MaxHeightDelta);
+		}
        return false;
     }
 	

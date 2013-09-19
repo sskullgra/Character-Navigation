@@ -90,13 +90,16 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 		mTerrainScale = terrainData.size;
 		
-		mTerrainResolution = (int)Mathf.Pow (2, resolution);
+		mTerrainResolution = resolution;
 		CalculateMeshScale ();
 		float[,] originHeightMap = terrainData.GetHeights (0, 0, mWidth, mHeight);
 		
 		mWidth = (terrainData.heightmapWidth - 1) / mTerrainResolution + 1;
 		mHeight = (terrainData.heightmapHeight - 1) / mTerrainResolution + 1;
 		
+		string widthHeightInfo = string.Format("Graph width {0}, graph height {1}, resoultion {2}", mWidth, mHeight, mTerrainResolution);
+		
+		Debug.Log(widthHeightInfo);
 		mHeightMap = new float[mWidth, mHeight];
 		
 		for (int x = 0; x < mWidth; x++) {

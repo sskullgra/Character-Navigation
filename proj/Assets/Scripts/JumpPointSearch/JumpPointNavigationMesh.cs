@@ -4,19 +4,58 @@ using System.Collections.Generic;
 using System.IO;
 using JumpPointSearach;
 
+/// <summary>
+/// Main navigation scrip uses Jump Point Search algorythm.
+/// Author: Radosław Bigaj
+/// POLITECHNIKA ŚLĄSKA 
+/// </summary>
 public class JumpPointNavigationMesh : MonoBehaviour
 {
 	
 	#region Public fields
-	
+	/// <summary>
+	/// The gizmo.
+	/// </summary>
 	public GameObject Gizmo;
+	
+	/// <summary>
+	/// The path material.
+	/// </summary>
 	public Material PathMaterial;
+	
+	/// <summary>
+	/// The start transform coordinates.
+	/// </summary>
 	public Transform StartTransform;
+	
+	/// <summary>
+	/// The destination transform coordinates.
+	/// </summary>
 	public Transform DestinationTransform;
+	
+	/// <summary>
+	/// Graph node resolution.
+	/// </summary>
 	public int resolution = 2;
+	
+	/// <summary>
+	/// The approximation radius.
+	/// </summary>
 	public int ApproximationRadius = 1;
+	
+	/// <summary>
+	/// The distance tolerance.
+	/// </summary>
 	public float DistanceTolerance = 4.0f;
+	
+	/// <summary>
+	/// The max height delta.
+	/// </summary>
 	public float MaxHeightDelta = 0.001f;
+	
+	/// <summary>
+	/// The initial mapping point.
+	/// </summary>
 	public Vector3 InitialMappingPoint;
 	
 	
@@ -24,16 +63,54 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 	#region Fields
 	
+	/// <summary>
+	/// The terrain position.
+	/// </summary>
 	private Vector3 mTerrainPosition;
-	private Vector3 mGizmoHeight = new Vector3();
+	
+	/// <summary>
+	/// The height of the gizmo.
+	/// </summary>
+	private Vector3 mGizmoHeight = new Vector3 ();
+	
+	/// <summary>
+	/// The mesh scale.
+	/// </summary>
 	private Vector3 mMeshScale;
+	
+	/// <summary>
+	/// The terrain scale.
+	/// </summary>
 	private Vector3 mTerrainScale;
+	
+	/// <summary>
+	/// The height map.
+	/// </summary>
 	private float[,] mHeightMap;
+	
+	/// <summary>
+	/// The width of the terrain/graph.
+	/// </summary>
 	private int mWidth = 0;
+	
+	/// <summary>
+	/// The height of the terrain/graph.
+	/// </summary>
 	private int mHeight = 0;
+	
+	/// <summary>
+	/// The m terrain resolution.
+	/// </summary>
 	private int mTerrainResolution = 4;
-
+	
+	/// <summary>
+	/// The m paths.
+	/// </summary>
 	private List<Object> mPaths = new List<Object> ();
+	
+	/// <summary>
+	/// The m neighbors.
+	/// </summary>
 	private List<Node> mNeighbors = null;
 	
 	#endregion
@@ -45,6 +122,9 @@ public class JumpPointNavigationMesh : MonoBehaviour
 	
 	#endregion
 	
+	/// <summary>
+	/// Start this instance. Init terrain data.
+	/// </summary>
 	void Start ()
 	{
 		TerrainCollider terrainCollider = GetComponent<TerrainCollider> ();
@@ -65,21 +145,30 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 	}
 	
+	/// <summary>
+	/// Raises the GUI event. Wait for button clicked and start coroutine.
+	/// </summary>
 	void OnGUI ()
 	{
 		if (GUI.Button (new Rect (10, 10, 100, 30), "Find path")) {
 			Gizmo.renderer.material = PathMaterial;
 			
-			Point startCor = GetGridPosition(StartTransform.position);
-			Vector3 startVec = GetWorldPosition(startCor.X, startCor.Y);
+			Point startCor = GetGridPosition (StartTransform.position);
+			Vector3 startVec = GetWorldPosition (startCor.X, startCor.Y);
 			
-			Point endCor = GetGridPosition(DestinationTransform.position);
-			Vector3 endVec = GetWorldPosition(endCor.X, endCor.Y);
+			Point endCor = GetGridPosition (DestinationTransform.position);
+			Vector3 endVec = GetWorldPosition (endCor.X, endCor.Y);
 			
-			StartCoroutine(FindPath(startVec, endVec));
+			StartCoroutine (FindPath (startVec, endVec));
 		}
 	}
 	
+	/// <summary>
+	/// Inits the terrain data.
+	/// </summary>
+	/// <param name='terrainCollider'>
+	/// Terrain collider.
+	/// </param>
 	private void InitTerrainData (TerrainCollider terrainCollider)
 	{
 		mTerrainPosition = GetComponent<Transform> ().position;
@@ -97,9 +186,9 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		mWidth = (terrainData.heightmapWidth - 1) / mTerrainResolution + 1;
 		mHeight = (terrainData.heightmapHeight - 1) / mTerrainResolution + 1;
 		
-		string widthHeightInfo = string.Format("Graph width {0}, graph height {1}, resoultion {2}", mWidth, mHeight, mTerrainResolution);
+		string widthHeightInfo = string.Format ("Graph width {0}, graph height {1}, resoultion {2}", mWidth, mHeight, mTerrainResolution);
 		
-		Debug.Log(widthHeightInfo);
+		Debug.Log (widthHeightInfo);
 		mHeightMap = new float[mWidth, mHeight];
 		
 		for (int x = 0; x < mWidth; x++) {
@@ -110,10 +199,13 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 		originHeightMap = null;
 		
-		 RemoveTrees (terrainData.treeInstances);
+		RemoveTrees (terrainData.treeInstances);
 		
 	}
 	
+	/// <summary>
+	/// Calculates the mesh scale.
+	/// </summary>
 	private void CalculateMeshScale ()
 	{
 		float scaledX = mTerrainScale.x / (mWidth - 1) * mTerrainResolution;
@@ -123,6 +215,12 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 	}
 	
+	/// <summary>
+	/// Removes the trees.
+	/// </summary>
+	/// <param name='trees'>
+	/// Trees.
+	/// </param>
 	private void RemoveTrees (TreeInstance[] trees)
 	{
 		int treeX = 0;
@@ -182,7 +280,15 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		}
 	}
 	
-	
+	/// <summary>
+	/// Gets the grid position.
+	/// </summary>
+	/// <returns>
+	/// The grid position.
+	/// </returns>
+	/// <param name='position'>
+	/// Position.
+	/// </param>
 	private Point GetGridPosition (Vector3 position)
 	{
 		int x = (int)(position.x / mMeshScale.x);
@@ -196,6 +302,18 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 	}
 	
+	/// <summary>
+	/// Gets the world position.
+	/// </summary>
+	/// <returns>
+	/// The world position.
+	/// </returns>
+	/// <param name='x'>
+	/// X coordinate.
+	/// </param>
+	/// <param name='y'>
+	/// Y coordinate.
+	/// </param>
 	private Vector3 GetWorldPosition (int x, int y)
 	{
 		float scaledX = mMeshScale.x * x;
@@ -206,6 +324,21 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 	}
 	
+	/// <summary>
+	/// Determines whether this instance is tree in range the specified treePosition x y.
+	/// </summary>
+	/// <returns>
+	/// <c>true</c> if this instance is tree in range the specified treePosition x y; otherwise, <c>false</c>.
+	/// </returns>
+	/// <param name='treePosition'>
+	/// If set to <c>true</c> tree position.
+	/// </param>
+	/// <param name='x'>
+	/// If set to <c>true</c> x.
+	/// </param>
+	/// <param name='y'>
+	/// If set to <c>true</c> y.
+	/// </param>
 	private bool IsTreeInRange (Vector3 treePosition, int x, int y)
 	{
 		if (x < mWidth && y < mHeight && y - 1 > -1 && x - 1 > -1) {
@@ -217,14 +350,44 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		}
 	}
 	
-	private bool isReachable(int px, int py, int x, int y){
-       if(x > -1 && y > -1 && x < mWidth && y < mHeight) { 
-			return (Mathf.Abs(mHeightMap[px,py] - mHeightMap[x,y]) < MaxHeightDelta);
+	/// <summary>
+	/// Checks is child node is reachable from parent.
+	/// </summary>
+	/// <returns>
+	/// Bool valus if point is reachable.
+	/// </returns>
+	/// <param name='px'>
+	/// If set to <c>true</c> px. Parent x coordinate.
+	/// </param>
+	/// <param name='py'>
+	/// If set to <c>true</c> py. Parent y coordinate
+	/// </param>
+	/// <param name='x'>
+	/// If set to <c>true</c> x. Child(current) x coordinate.
+	/// </param>
+	/// <param name='y'>
+	/// If set to <c>true</c> y. Child(current) y coordinate.
+	/// </param>
+	private bool isReachable (int px, int py, int x, int y)
+	{
+		if (x > -1 && y > -1 && x < mWidth && y < mHeight) { 
+			return (Mathf.Abs (mHeightMap [px, py] - mHeightMap [x, y]) < MaxHeightDelta);
 		}
-       return false;
-    }
+		return false;
+	}
 	
-	
+	/// <summary>
+	/// Gets the neighbors nodes.
+	/// </summary>
+	/// <returns>
+	/// The neighbors.
+	/// </returns>
+	/// <param name='currentNode'>
+	/// Current node.
+	/// </param>
+	/// <param name='destinationNode'>
+	/// Destination node.
+	/// </param>
 	private List<Node> GetNeighbors (Node currentNode, Vector3 destinationNode)
 	{
 		mNeighbors = new List<Node> ();
@@ -338,6 +501,24 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 	}
 	
+	/// <summary>
+	/// Checks the and create neighbor.
+	/// </summary>
+	/// <param name='currentNode'>
+	/// Current node.
+	/// </param>
+	/// <param name='dx'>
+	/// Dx.
+	/// </param>
+	/// <param name='dy'>
+	/// Dy.
+	/// </param>
+	/// <param name='destinationTarget'>
+	/// Destination target.
+	/// </param>
+	/// <param name='condition'>
+	/// Condition.
+	/// </param>
 	private void checkAndCreateNeighbor (Node currentNode, int dx, int dy, Vector3 destinationTarget, bool condition)
 	{
 		if (condition) {
@@ -349,7 +530,24 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		}
 	}
 	
-	
+	/// <summary>
+	/// Jump(JPS algorithm) the specified x, y, parentX, parentY and destinationTarget.
+	/// </summary>
+	/// <param name='x'>
+	/// X.
+	/// </param>
+	/// <param name='y'>
+	/// Y.
+	/// </param>
+	/// <param name='parentX'>
+	/// Parent x.
+	/// </param>
+	/// <param name='parentY'>
+	/// Parent y.
+	/// </param>
+	/// <param name='destinationTarget'>
+	/// Destination target.
+	/// </param>
 	private Point Jump (int x, int y, int parentX, int parentY, Vector3 destinationTarget)
 	{
 		int dx = x - parentX;
@@ -402,6 +600,18 @@ public class JumpPointNavigationMesh : MonoBehaviour
 		
 	}
 	
+	/// <summary>
+	/// Finds the path.
+	/// </summary>
+	/// <returns>
+	/// The path.
+	/// </returns>
+	/// <param name='start'>
+	/// Start vector.
+	/// </param>
+	/// <param name='destinationTarget'>
+	/// Destination target.
+	/// </param>
 	private IEnumerator FindPath (Vector3 start, Vector3 destinationTarget)
 	{
 		foreach (Object path  in mPaths) {
@@ -455,7 +665,7 @@ public class JumpPointNavigationMesh : MonoBehaviour
 				if (closedList.Contains (jumpNode))
 					continue;
 				
-				float estimatedCost = Node.estimate(jumpNode.NodePosition, currentNode.NodePosition);
+				float estimatedCost = Node.estimate (jumpNode.NodePosition, currentNode.NodePosition);
 				cost = currentNode.CostFromStart + estimatedCost;
 				
 				
@@ -467,7 +677,7 @@ public class JumpPointNavigationMesh : MonoBehaviour
 				jumpNode.CostFromStart = cost;
 				jumpNode.CostFunction = jumpNode.CostFromStart + jumpNode.HeuristicEstimateCost;
 				
-				if (index >= 0){
+				if (index >= 0) {
 					openList.RemoveAt (index);
 				}
 				openList.Push (neighbor);
@@ -477,7 +687,7 @@ public class JumpPointNavigationMesh : MonoBehaviour
 			closedList.Push (currentNode);
 		}
 		
-		Debug.Log(string.Format(timeAndNodesFormat, (Time.realtimeSinceStartup-time)*1000f, paths.Count ));
+		Debug.Log (string.Format (timeAndNodesFormat, (Time.realtimeSinceStartup - time) * 1000f, paths.Count));
 		//Debug.Log (string.Format ("Nodes in path: {0}", paths.Count));
 		
 		foreach (Vector3 path in paths) {
